@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "net/http"
 require "json"
 require "uri"
@@ -6,13 +7,44 @@ require "uri"
 class ForecastService
   class FetchError < StandardError; end
 
-  FORECAST_DAYS = 8
   TEMP_PRECISION = 0
+  FORECAST_DAYS  = 8
+
+  CONDITION_MAP = {
+    sunny: [1, 2],
+    cloudy: [3],
+    fog: [45, 48],
+    drizzle: [51, 53, 55, 56, 57],
+    rain: [61, 63, 65, 80, 81, 82, 66, 67],
+    snow: [71, 73, 75, 77, 85, 86],
+    thunder: [95, 96, 99]
+  }.freeze
 
   class << self
     def fetch(lat:, lon:)
+      res = http_get(build_uri(lat, lon))
+      raise FetchError, "HTTP #{res.code}" unless res.is_a?(Net::HTTPSuccess)
+
+      data      = JSON.parse(res.body)
+      current   = parse_current(data)
+      days      = parse_daily(data)
+      condition = wmo_to_condition(current[:wmo], current[:is_day])
+
+      build_result(current, days, condition)
+    rescue JSON::ParserError => e
+      raise FetchError, "Invalid JSON: #{e.message}"
+    end
+
+    private
+
+    def build_uri(lat, lon)
       uri = URI("https://api.open-meteo.com/v1/forecast")
-      params = {
+      uri.query = URI.encode_www_form(forecast_params(lat, lon))
+      uri
+    end
+
+    def forecast_params(lat, lon)
+      {
         latitude: lat,
         longitude: lon,
         current: "temperature_2m,weather_code,is_day",
@@ -20,46 +52,32 @@ class ForecastService
         timezone: "auto",
         forecast_days: FORECAST_DAYS
       }
-      uri.query = URI.encode_www_form(params)
-
-      res = http_get(uri)
-      raise FetchError, "HTTP #{res.code}" unless res.is_a?(Net::HTTPSuccess)
-
-      data = JSON.parse(res.body)
-
-      c_raw   = (data.dig("current", "temperature_2m") || data.dig("current", "temperature")).to_f
-      wmo     = data.dig("current", "weather_code")
-      is_day  = data.dig("current", "is_day")
-      is_dayi = (is_day == true || is_day == false) ? (is_day ? 1 : 0) : is_day.to_i
-
-      days = (data.dig("daily", "time") || []).map.with_index do |date, i|
-        {
-          date: date,
-          min_c: data.dig("daily", "temperature_2m_min")[i],
-          max_c: data.dig("daily", "temperature_2m_max")[i]
-        }
-      end
-
-      today = days.first || {}
-      condition = wmo_to_condition(wmo, is_dayi)
-
-      {
-        current_c: round_temperature(c_raw),
-        current_f: round_temperature(c_to_f(c_raw)),
-        today_high_c: round_temperature(today[:max_c]),
-        today_low_c:  round_temperature(today[:min_c]),
-        daily: days.map { |d|
-          { date: d[:date], min_c: round_temperature(d[:min_c]), max_c: round_temperature(d[:max_c]) }
-        },
-        weather_code: wmo,
-        is_day: is_dayi,
-        condition: condition
-      }
-    rescue JSON::ParserError => e
-      raise FetchError, "Invalid JSON: #{e.message}"
     end
 
-    private
+    def parse_current(data)
+      c = (data.dig("current", "temperature_2m") || data.dig("current", "temperature")).to_f
+
+      {
+        c: c,
+        wmo: data.dig("current", "weather_code"),
+        is_day: normalize_is_day(data.dig("current", "is_day"))
+      }
+    end
+
+    def parse_daily(data)
+      times = data.dig("daily", "time") || []
+      mins  = data.dig("daily", "temperature_2m_min") || []
+      maxs  = data.dig("daily", "temperature_2m_max") || []
+
+      times.each_with_index.map { |date, i| { date:, min_c: mins[i], max_c: maxs[i] } }
+    end
+
+    def normalize_is_day(data)
+      return 1 if data == true
+      return 0 if data == false
+
+      data.to_i
+    end
 
     def http_get(uri)
       Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
@@ -70,38 +88,43 @@ class ForecastService
       end
     end
 
-    def c_to_f(c)
-      ((c * 9.0 / 5.0) + 32.0).round(1)
+    def c_to_f(current)
+      (current * 9.0 / 5.0) + 32.0
     end
 
     def round_temperature(temp)
       return nil if temp.nil?
+
       nd = TEMP_PRECISION
-      nd == 0 ? temp.round : temp.round(nd)
+      nd.zero? ? temp.round : temp.round(nd)
     end
 
     def wmo_to_condition(code, is_day)
       c = code.to_i
+      return (is_day == 1 ? :sunny : :clear_night) if c.zero?
 
-      case c
-      when 0
-        is_day == 1 ? :sunny : :clear_night
-      when 1, 2
-        :sunny
-      when 3
-        :cloudy
-      when 45, 48
-        :fog
-      when 51, 53, 55, 56, 57
-        :drizzle
-      when 61, 63, 65, 80, 81, 82, 66, 67
-        :rain
-      when 71, 73, 75, 77, 85, 86
-        :snow
-      when 95, 96, 99
-        :thunder
-      else
-        is_day == 1 ? :sunny : :clear_night
+      CONDITION_MAP.each { |sym, list| return sym if list.include?(c) }
+
+      is_day == 1 ? :sunny : :clear_night
+    end
+
+    def build_result(current, days, condition)
+      today = days.first || {}
+      {
+        current_c: round_temperature(current[:c]),
+        current_f: round_temperature(c_to_f(current[:c])),
+        today_high_c: round_temperature(today[:max_c]),
+        today_low_c: round_temperature(today[:min_c]),
+        daily: build_daily(days),
+        weather_code: current[:wmo],
+        is_day: current[:is_day],
+        condition:
+      }
+    end
+
+    def build_daily(days)
+      days.map do |d|
+        { date: d[:date], min_c: round_temperature(d[:min_c]), max_c: round_temperature(d[:max_c]) }
       end
     end
   end

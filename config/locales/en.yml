@@ -1,0 +1,5 @@
+en:
+  alerts:
+    missing_address: "Please enter an address."
+    not_found: "Could not find that address."
+    weather_unavailable: "Weather service is unavailable right now."

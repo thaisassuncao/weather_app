@@ -1,31 +1,38 @@
 # frozen_string_literal: true
+
 module ForecastsHelper
+  CONDITION_LABELS = {
+    sunny: "Sunny",
+    clear_night: "Clear night",
+    cloudy: "Cloudy",
+    drizzle: "Drizzle",
+    rain: "Rain",
+    snow: "Snow",
+    fog: "Fog",
+    thunder: "Thunderstorms"
+  }.freeze
+
+  CONDITION_EMOJIS = {
+    sunny: "☀️",
+    clear_night: "🌙",
+    cloudy: "☁️",
+    drizzle: "🌦️",
+    rain: "🌧️",
+    snow: "🌨️",
+    fog: "🌫️",
+    thunder: "⛈️"
+  }.freeze
+
   def condition_name(condition, is_day)
-    case condition
-    when :sunny        then is_day.to_i == 1 ? "Sunny" : "Clear"
-    when :clear_night  then "Clear night"
-    when :cloudy       then "Cloudy"
-    when :drizzle      then "Drizzle"
-    when :rain         then "Rain"
-    when :snow         then "Snow"
-    when :fog          then "Fog"
-    when :thunder      then "Thunderstorms"
-    else "Weather"
-    end
+    return "Clear" if condition == :sunny && is_day.to_i != 1
+
+    CONDITION_LABELS[condition] || "Weather"
   end
 
   def condition_emoji(condition, is_day)
-    case condition
-    when :sunny        then is_day.to_i == 1 ? "☀️" : "🌙"
-    when :clear_night  then "🌙"
-    when :cloudy       then "☁️"
-    when :drizzle      then "🌦️"
-    when :rain         then "🌧️"
-    when :snow         then "🌨️"
-    when :fog          then "🌫️"
-    when :thunder      then "⛈️"
-    else "🌤️"
-    end
+    return "🌙" if condition == :sunny && is_day.to_i != 1
+
+    CONDITION_EMOJIS[condition] || "🌤️"
   end
 
   def short_weekday(date_str)

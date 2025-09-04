@@ -7,21 +7,27 @@ on:
     branches: [ main ]
 
 jobs:
-  rspec:
+  rubocop:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.9
           bundler-cache: true
+      - name: RuboCop
+        run: bundle exec rubocop
 
-      - name: Run RSpec
+  rspec:
+    runs-on: ubuntu-latest
+    needs: rubocop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.9
+          bundler-cache: true
+      - name: RSpec
         env:
           RAILS_ENV: test
-        run: |
-          bundle exec rspec --format documentation
+        run: bundle exec rspec --format documentation

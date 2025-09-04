@@ -1,30 +1,43 @@
 ## Weather Forecast App
 
 A Ruby on Rails project that retrieves worldwide weather forecasts based on a user-provided address.
-The app geocodes the address, fetches weather data, and displays the current temperature, today’s high/low, and a 7-day extended forecast.
+It geocodes the address, fetches weather, and shows current °C/°F, today’s high/low, and a multi-day forecast.
 
 - Ruby 3.3.9 / Rails 7.2.2.2
-- Caches weather 30 min by postal/ZIP (fallback: lat/lon).
+- Caches weather every 30 min by postal/ZIP Code.
 
 ### Project Structure
 ```
 ├── app
 │   ├── controllers
-│   │   └── forecasts_controller.rb   # Handles search and display of forecasts
+│   │   └── forecasts_controller.rb        # handles search, cache and display of forecasts
+│   ├── helpers
+│   │   └── forecasts_helper.rb            # labels/emojis and date formatting helpers
 │   ├── services
-│   │   ├── geocoding_service.rb      # Wraps Nominatim geocoding
-│   │   └── forecast_service.rb       # Wraps Open-Meteo weather API
-│   └── views
-│       └── forecasts/new.html.erb    # search UI + forecast results
+│   │   ├── geocoding_service.rb           # wraps Nominatim geocoding
+│   │   └── forecast_service.rb            # wraps Open-Meteo weather API and temperature rounding
+│   ├── views
+│   │   ├── layouts/application.html.erb   # handles background overlay
+│   │   └── forecasts/new.html.erb         # search UI and forecast results
+│   └── assets/stylesheets/application.css # responsive UI styling + themes
+│
+├── config
+│   ├── application.rb                     # rails app configs
+│   ├── environments/ (dev/test/prod)      # environment configs
+│   └── locales/en.yml                     # i18n strings
 │
 ├── spec
-│   ├── requests/forecasts_spec.rb    # Request specs (cache, errors, flows)
-│   ├── services                      # Unit tests for services
-│   └── support/webmock.rb            # Stubs external HTTP calls
+│   ├── requests/forecasts_spec.rb         # request specs (cache, errors, flows)
+│   ├── services
+│   │   ├── forecast_service_spec.rb       # unit tests for forecast service
+│   │   └── geocoding_service_spec.rb      # unit tests for geocoding service
+│   ├── support/webmock.rb                 # webmock setup
+│   └── rails_helper.rb                    # rails rspec tests configs
 │
-├── config                             # Rails app & environment configs
-├── .github/workflows/ci.yml           # GitHub Actions CI (RSpec on push/PR)
-├── Gemfile                            # Dependencies
+├── .github/workflows/ci.yml               # GitHub Actions CI (RuboCop + RSpec)
+├── .rubocop.yml                           # linter rules
+├── Gemfile                                # dependencies
+├── Rakefile                               # tasks
 └── README.md
 ```
 
@@ -46,4 +59,9 @@ http://localhost:3000
 ### Running Tests
 ```sh
 $ bundle exec rspec
+```
+
+### Running Linter
+```sh
+$ bundle exec rubocop
 ```

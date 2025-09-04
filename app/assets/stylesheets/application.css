@@ -1,0 +1,122 @@
+:root {
+  --bg: #fff;
+  --text: #202124;
+  --muted: #5f6368;
+  --brand: #1a73e8;
+  --card: #fff;
+  --border: #dadce0;
+  --shadow: 0 1px 3px rgba(60,64,67,.3), 0 1px 2px rgba(60,64,67,.15);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, Segoe UI, Roboto, Helvetica, Arial, "Segoe UI Emoji";
+}
+
+.page {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.logo {
+  font-size: 48px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+  color: var(--brand);
+}
+
+.search-form {
+  display: flex;
+  width: min(720px, 90vw);
+  box-shadow: var(--shadow);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+  background: var(--card);
+}
+
+.search-input {
+  flex: 1;
+  border: 0;
+  padding: 14px 18px;
+  font-size: 18px;
+  outline: none;
+  background: transparent;
+}
+
+.search-btn {
+  border: 0;
+  background: var(--brand);
+  color: #fff;
+  padding: 0 22px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.alert {
+  color: #b00020;
+  margin-top: 8px;
+}
+
+.card {
+  width: min(720px, 90vw);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.title { font-size: 18px; font-weight: 600; }
+.subtitle { color: var(--muted); font-size: 14px; }
+
+.badge {
+  font-size: 12px;
+  background: #e8f0fe;
+  color: var(--brand);
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #d2e3fc;
+}
+
+.current {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+
+.temp { font-size: 48px; font-weight: 600; }
+.temp-alt { color: var(--muted); }
+.hl { margin-left: auto; color: var(--muted); }
+
+.daily {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.day {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.day-date { font-weight: 600; margin-bottom: 4px; }
+.day-temps { color: var(--muted); }

@@ -1,0 +1,45 @@
+# Ignore bundler config
+/.bundle
+
+# Ignore all logfiles and tempfiles.
+/log/*
+!/log/.keep
+/tmp
+!/tmp/.keep
+
+# Ignore pidfiles, sockets, cache, and metadata
+*.pid
+*.pid.lock
+*.seed
+*.dump
+*.swo
+*.swp
+*.DS_Store
+
+# Rails cache, assets, and storage
+/public/assets
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+.byebug_history
+/storage/*
+!/storage/.keep
+
+# Coverage, docs, and artifacts
+/coverage
+/spec/examples.txt
+/doc/api
+/doc/app
+
+# Ignore credentials and master key (DO NOT SHARE THESE)
+/config/master.key
+/config/credentials.yml.enc
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore system files
+Thumbs.db
+.DS_Store

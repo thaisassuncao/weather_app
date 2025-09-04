@@ -1,0 +1,45 @@
+<div class="page">
+  <div class="logo">Weather Forecast</div>
+
+  <%= form_with url: forecast_path, method: :post, local: true, class: "search-form" do |f| %>
+    <%= f.text_field :address, value: @address, placeholder: "Type an address (anywhere in the world)", class: "search-input", autofocus: true %>
+    <%= f.submit "Search", class: "search-btn" %>
+  <% end %>
+
+  <% if flash[:alert] %>
+    <div class="alert"><%= flash[:alert] %></div>
+  <% end %>
+
+  <% if @forecast.present? %>
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="title"><%= @location_name %></div>
+          <% if @postal_code.present? %>
+            <div class="subtitle">Postal/ZIP: <%= @postal_code %> (<%= @country_code&.upcase %>)</div>
+          <% end %>
+        </div>
+        <% if @from_cache %>
+          <span class="badge">from cache</span>
+        <% end %>
+      </div>
+
+      <div class="current">
+        <div class="temp"><%= @forecast[:current_c] %>°C</div>
+        <div class="temp-alt">(<%= @forecast[:current_f] %>°F)</div>
+        <div class="hl">
+          Today: <strong>H <%= @forecast[:today_high_c] %>°C</strong> / <strong>L <%= @forecast[:today_low_c] %>°C</strong>
+        </div>
+      </div>
+
+      <div class="daily">
+        <% @forecast[:daily].each do |d| %>
+          <div class="day">
+            <div class="day-date"><%= d[:date] %></div>
+            <div class="day-temps">H <%= d[:max_c] %>°C · L <%= d[:min_c] %>°C</div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

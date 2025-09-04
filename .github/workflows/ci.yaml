@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  rspec:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.9
+          bundler-cache: true  # caches gems based on Gemfile.lock
+
+      - name: Run RSpec
+        env:
+          RAILS_ENV: test
+        run: |
+          bundle exec rspec --format documentation

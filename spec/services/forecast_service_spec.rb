@@ -2,9 +2,15 @@
 require "rails_helper"
 
 RSpec.describe ForecastService do
+  def r(x)
+    nd = ForecastService::TEMP_PRECISION
+    return nil if x.nil?
+    nd == 0 ? x.round : x.round(nd)
+  end
+
   it "parses current and daily temps" do
     body = {
-      "current" => { "temperature_2m" => 21.3 },
+      "current" => { "temperature_2m" => 21.3, "weather_code" => 0, "is_day" => 0 },
       "daily" => {
         "time" => ["2025-09-04", "2025-09-05"],
         "temperature_2m_max" => [27.2, 26.1],
@@ -16,9 +22,9 @@ RSpec.describe ForecastService do
       .to_return(status: 200, body: body, headers: { "Content-Type" => "application/json" })
 
     res = described_class.fetch(lat: 40.7, lon: -74.0)
-    expect(res[:current_c]).to eq(21.3.round(1))
-    expect(res[:current_f]).to eq(((21.3*9.0/5)+32).round(1))
-    expect(res[:today_high_c]).to eq(27.2.round(1))
+    expect(res[:current_c]).to eq(r(21.3))
+    expect(res[:current_f]).to eq(r((21.3 * 9.0 / 5.0) + 32.0))
+    expect(res[:today_high_c]).to eq(r(27.2))
     expect(res[:daily].size).to eq(2)
   end
 

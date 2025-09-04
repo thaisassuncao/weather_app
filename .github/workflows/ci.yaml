@@ -18,7 +18,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.9
-          bundler-cache: true  # caches gems based on Gemfile.lock
+          bundler-cache: true
 
       - name: Run RSpec
         env:

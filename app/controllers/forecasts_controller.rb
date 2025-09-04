@@ -24,9 +24,9 @@ class ForecastsController < ApplicationController
 
     key =
       if @postal_code.present? && @country_code.present?
-        "forecast:zip:#{@country_code.downcase}-#{@postal_code.downcase}"
+        "forecast:zip:#{@country_code.downcase}-#{@postal_code.downcase}:d#{ForecastService::FORECAST_DAYS}"
       else
-        "forecast:latlon:#{format('%.4f', lat)}_#{format('%.4f', lon)}"
+        "forecast:latlon:#{format('%.4f', lat)}_#{format('%.4f', lon)}:d#{ForecastService::FORECAST_DAYS}"
       end
 
     cached = Rails.cache.read(key)
@@ -38,6 +38,8 @@ class ForecastsController < ApplicationController
       @from_cache = false
       Rails.cache.write(key, @forecast, expires_in: 30.minutes)
     end
+
+    @theme_class = "theme-#{(@forecast[:condition] || :default).to_s.dasherize}"
 
     render :new, status: :ok
   rescue ForecastService::FetchError => e

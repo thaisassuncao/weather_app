@@ -2,7 +2,7 @@
   --bg: #fff;
   --text: #202124;
   --muted: #5f6368;
-  --brand: #1a73e8;
+  --brand: #7C5A3C;
   --card: #fff;
   --border: #dadce0;
   --shadow: 0 1px 3px rgba(60,64,67,.3), 0 1px 2px rgba(60,64,67,.15);
@@ -10,6 +10,7 @@
 
 * { box-sizing: border-box; }
 html, body { height: 100%; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -24,22 +25,29 @@ body {
   padding: 24px;
 }
 
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 80px;
+}
+
 .logo {
-  font-size: 48px;
+  font-size: clamp(32px, 6vw, 48px);
   font-weight: 600;
-  margin-bottom: 24px;
+  margin-bottom: 0;
   letter-spacing: -0.5px;
   color: var(--brand);
 }
 
 .search-form {
   display: flex;
-  width: min(720px, 90vw);
+  width: min(720px, 92vw);
   box-shadow: var(--shadow);
   border-radius: 999px;
   overflow: hidden;
   border: 1px solid var(--border);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   background: var(--card);
 }
 
@@ -47,7 +55,7 @@ body {
   flex: 1;
   border: 0;
   padding: 14px 18px;
-  font-size: 18px;
+  font-size: 16px;
   outline: none;
   background: transparent;
 }
@@ -67,7 +75,7 @@ body {
 }
 
 .card {
-  width: min(720px, 90vw);
+  width: min(720px, 92vw);
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -76,35 +84,83 @@ body {
 }
 
 .card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
   gap: 12px;
   margin-bottom: 8px;
 }
 
-.title { font-size: 18px; font-weight: 600; }
-.subtitle { color: var(--muted); font-size: 14px; }
+.card-header > div:first-child { min-width: 0; }
+
+.title {
+	font-size: 18px;
+	font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+	margin-bottom: 4px;
+}
+
+.subtitle {
+	color: var(--muted);
+	font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .badge {
+  white-space: nowrap;
   font-size: 12px;
-  background: #e8f0fe;
+  background: #F2E7DC;
   color: var(--brand);
   padding: 4px 8px;
   border-radius: 999px;
-  border: 1px solid #d2e3fc;
+  border: 1px solid #E6D7C6;
+  height: fit-content;
 }
 
 .current {
   display: flex;
   align-items: baseline;
   gap: 12px;
-  margin: 8px 0 16px;
+  flex-wrap: wrap;
 }
 
-.temp { font-size: 48px; font-weight: 600; }
-.temp-alt { color: var(--muted); }
-.hl { margin-left: auto; color: var(--muted); }
+.current-group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 0 1 auto;
+  white-space: nowrap;
+}
+
+.temp { font-size: clamp(32px, 10vw, 48px); font-weight: 600; flex: 0 0 auto; }
+.temp-alt { color: var(--muted); white-space: nowrap; }
+
+.hl {
+  margin-left: auto;
+  color: var(--muted);
+  align-self: baseline;
+}
+
+.condition-chip { margin: 0; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 13px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--border);
+}
+.chip-emoji { line-height: 1; }
+.chip-label { white-space: nowrap; }
 
 .daily {
   display: grid;
@@ -120,3 +176,94 @@ body {
 
 .day-date { font-weight: 600; margin-bottom: 4px; }
 .day-temps { color: var(--muted); }
+
+/* mobile improvements */
+@media (max-width: 640px) {
+  .page { padding: 16px; }
+	.hero { gap: 8px; }
+  .card { width: 100%; padding: 12px; }
+
+  .card-header {
+    align-items: flex-start;
+  }
+
+  .current {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .current .hl {
+    flex-basis: 100%;
+    margin-left: 0;
+    align-self: auto;
+  }
+
+  .hl {
+		margin-left: 0; 
+		margin-bottom: 4px;
+	}
+
+  .daily {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+}
+
+@media (max-width: 400px) {
+  .daily { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 360px) {
+	.chip-label { display: none; }
+}
+
+/* weather theme backgrounds (earth tones) */
+body[class^="theme-"], body[class*=" theme-"] {
+  min-height: 100%;
+  background-attachment: fixed;
+  background-size: 200% 200%;
+  animation: gradientShift 30s ease infinite;
+}
+
+body.theme-sunny {
+  background: linear-gradient(180deg, #F0E2B6 0%, #D9A441 100%);
+}
+
+body.theme-clear-night {
+  background: linear-gradient(180deg, #2F2F2F 0%, #1E2329 100%);
+}
+
+body.theme-cloudy {
+  background: linear-gradient(180deg, #E4DFD7 0%, #B8B2A7 100%);
+}
+
+body.theme-drizzle {
+  background: linear-gradient(180deg, #DDE7DF 0%, #A3B18A 100%);
+}
+
+body.theme-rain {
+  background: linear-gradient(180deg, #B3C0C9 0%, #5B6B73 100%);
+}
+
+body.theme-snow {
+  background: linear-gradient(180deg, #F7F4EE 0%, #E6E0D4 100%);
+}
+
+body.theme-fog {
+  background: linear-gradient(180deg, #E9E5DC 0%, #CEC7B8 100%);
+}
+
+body.theme-thunder {
+  background: linear-gradient(180deg, #A67A5B 0%, #3F3A3A 100%);
+}
+
+body.theme-default {
+  background: linear-gradient(180deg, #EFEAE3 0%, #D8D2C7 100%);
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 50% 0%; }
+  50%  { background-position: 50% 100%; }
+  100% { background-position: 50% 0%; }
+}

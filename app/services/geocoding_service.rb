@@ -4,15 +4,17 @@ require "json"
 require "uri"
 
 class GeocodingService
+  ADDRESS_DETAILS = 1
+  LIMIT = 1
+
   class << self
-    # Returns: { lat:, lon:, display_name:, postal_code:, country_code: }
     def geocode(query)
       url = URI("https://nominatim.openstreetmap.org/search")
       params = {
         q: query,
         format: "json",
-        addressdetails: 1,
-        limit: 1
+        addressdetails: ADDRESS_DETAILS,
+        limit: LIMIT
       }
       url.query = URI.encode_www_form(params)
 

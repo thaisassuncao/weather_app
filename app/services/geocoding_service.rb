@@ -1,28 +1,32 @@
 # frozen_string_literal: true
+
 require "net/http"
 require "json"
 require "uri"
 
 class GeocodingService
-  ADDRESS_DETAILS = 1
-  LIMIT = 1
-
   class << self
     def geocode(query)
-      url = URI("https://nominatim.openstreetmap.org/search")
-      params = {
-        q: query,
-        format: "json",
-        addressdetails: ADDRESS_DETAILS,
-        limit: LIMIT
-      }
-      url.query = URI.encode_www_form(params)
-
+      url = build_url(query)
       res = http_get(url, headers: nominatim_headers)
+
       return nil unless res.is_a?(Net::HTTPSuccess)
 
       json = JSON.parse(res.body)
-      first = json.first
+      parse_result(json.first)
+    rescue JSON::ParserError
+      nil
+    end
+
+    private
+
+    def build_url(query)
+      url = URI("https://nominatim.openstreetmap.org/search")
+      url.query = URI.encode_www_form(q: query, format: "json", addressdetails: 1, limit: 1)
+      url
+    end
+
+    def parse_result(first)
       return nil unless first
 
       addr = first["address"] || {}
@@ -34,8 +38,6 @@ class GeocodingService
         country_code: addr["country_code"]
       }
     end
-
-    private
 
     def http_get(uri, headers: {})
       Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|

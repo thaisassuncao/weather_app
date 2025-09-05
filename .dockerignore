@@ -1,0 +1,12 @@
+.git
+.bundle
+log
+tmp
+spec
+node_modules
+vendor/bundle
+.storage
+coverage
+.env
+.byebug_history
+*.swp

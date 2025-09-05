@@ -1,12 +1,16 @@
-## Weather Forecast App
+# Weather Forecast App
 
-A Ruby on Rails project that retrieves worldwide weather forecasts based on a user-provided address.
-It geocodes the address, fetches weather, and shows current °C/°F, today’s high/low, and a multi-day forecast.
+A Ruby on Rails project that retrieves worldwide weather forecasts based on a user-provided address.<br>
+It geocodes the address, fetches the weather, and shows the current °C/°F, today’s high/low, and a multi-day forecast.<br>
+It also caches forecasts for 30 minutes by postal/ZIP code.
 
-- Ruby 3.3.9 / Rails 7.2.2.2
-- Caches weather every 30 min by postal/ZIP Code.
+### Dependencies
+- Ruby [v3.3.9](https://www.ruby-lang.org/en/news/2025/07/24/ruby-3-3-9-released/)
+- Rails [v7.2.2.2](https://rubygems.org/gems/rails/versions/7.2.2.2)
 
-### Project Structure
+If needed, see the [official Ruby installation documentation](https://www.ruby-lang.org/en/documentation/installation/).
+
+## Project Structure
 ```
 ├── app
 │   ├── controllers
@@ -41,27 +45,37 @@ It geocodes the address, fetches weather, and shows current °C/°F, today’s h
 └── README.md
 ```
 
-### Running the Project
+## Running the Project Locally
 
-#### Install dependencies:
+#### 1. Install dependencies:
 ```sh
 $ bundle install
 ```
 
-#### Start the Rails server:
+#### 2. Start the Rails server:
 ```sh
 $ bin/rails s
 ```
 
-#### Then visit on your browser:
+#### 3. Visit in your browser:
 http://localhost:3000
 
-### Running Tests
+## Running the Project in Docker
+
+#### 1. Build and run the application:
+```sh
+$ make up
+```
+
+#### 2. Visit in your browser:
+http://localhost:3000
+
+## Running Tests
 ```sh
 $ bundle exec rspec
 ```
 
-### Running Linter
+## Running the Linter
 ```sh
 $ bundle exec rubocop
 ```

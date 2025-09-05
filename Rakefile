@@ -3,5 +3,9 @@
 require_relative "config/application"
 Rails.application.load_tasks
 
-require "rubocop/rake_task"
-RuboCop::RakeTask.new(:rubocop)
+begin
+  require "rubocop/rake_task"
+  RuboCop::RakeTask.new(:rubocop)
+rescue LoadError
+  # Docker fallback for RuboCop not installed
+end
